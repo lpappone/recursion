@@ -61,6 +61,9 @@ var stringifyJSON = function(obj) {
             finalresult.push(results.join(""));
             results = [];
           } else { 
+            if (Array.isArray(obj[i])== true) {
+              finalresult.push("[");
+            }
             checkType(obj[i]);
           }
           
