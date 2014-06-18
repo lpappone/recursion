@@ -43,16 +43,20 @@ var stringifyJSON = function(obj) {
       }
       finalresult.push("{" + results.join("") + "}");
     } else {
+        if(Array.isArray(obj) == true && obj.length === 0) {
+          finalresult.push("[]");
+        }
         for (i = 0; i < obj.length; i++) {
+          console.log(obj.length);
           if (Array.isArray(obj[i]) == false) {
-            finalresult.push("[");
+            if (i === 0) {finalresult.push("[");}
             //if(i > 0) {results.push(",");}
             var thing = checkType(obj[i]);
             results.push(thing + ",");
             if(i >= obj.length - 1) {results.push("]")}
             finalresult.push(results.join(""));
           } else { 
-            runThroughObject(obj[i]);
+            checkType(obj[i]);
           }
           
         }
