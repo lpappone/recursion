@@ -52,9 +52,14 @@ var stringifyJSON = function(obj) {
             if (i === 0) {finalresult.push("[");}
             //if(i > 0) {results.push(",");}
             var thing = checkType(obj[i]);
-            results.push(thing + ",");
+            if (i < obj.length - 1) {
+              results.push(thing + ",");
+            } else {
+              results.push(thing);
+            }
             if(i >= obj.length - 1) {results.push("]")}
             finalresult.push(results.join(""));
+            results = [];
           } else { 
             checkType(obj[i]);
           }
