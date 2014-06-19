@@ -4,7 +4,10 @@
 // but you don't so you're going to write it from scratch:
 var stringifyJSON = function(obj) {
   var finalresult = [];
-  var placeholder
+  var placeholder;
+  var openbracket = 0;
+  var closebracket = 0;
+  var arrayopen = false;
 
   function checkType(x) {
     if(typeof x == "number" || typeof x == "boolean" || x == null) {
@@ -43,13 +46,26 @@ var stringifyJSON = function(obj) {
       }
       finalresult.push("{" + results.join("") + "}");
     } else {
+        console.log(obj);
+        console.log(finalresult);
         if(Array.isArray(obj) == true && obj.length === 0) {
-          finalresult.push("[]");
+          if(arrayopen) {
+            finalresult.push("]");
+            closebracket++;
+          } else {
+            finalresult.push("[]");
+            openbracket++;
+            closebracket++;
+          }
+          
         }
         for (i = 0; i < obj.length; i++) {
-          console.log(obj.length);
+          //console.log(obj.length);
           if (Array.isArray(obj[i]) == false) {
-            if (i === 0) {finalresult.push("[");}
+            if (i === 0) {
+              finalresult.push("[");
+              openbracket++;
+            }
             //if(i > 0) {results.push(",");}
             var thing = checkType(obj[i]);
             if (i < obj.length - 1) {
@@ -57,19 +73,33 @@ var stringifyJSON = function(obj) {
             } else {
               results.push(thing);
             }
-            if(i >= obj.length - 1) {results.push("]")}
+            if(i >= obj.length - 1) {
+              results.push("]");
+              arrayopen = false;
+              closebracket++;
+            }
             finalresult.push(results.join(""));
             results = [];
           } else { 
             if (Array.isArray(obj[i])== true) {
               finalresult.push("[");
+              arrayopen = true;
+              openbracket++
             }
             checkType(obj[i]);
           }
           
         }
     }
+    
+    // while (openbracket > closebracket) {
+    //   finalresult.push("]");
+    //   closebracket++;
+    // }
+    
     return finalresult.join("");
   };
   return checkType(obj);
 };
+
+//stringifyJSON([8,[[],3,4]])
