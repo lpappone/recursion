@@ -3,6 +3,7 @@
 
 // but you don't so you're going to write it from scratch:
 var stringifyJSON = function(obj) {
+  var miniresult = [];
   var finalresult = [];
   var placeholder;
   var openbracket = 0;
@@ -22,21 +23,34 @@ var stringifyJSON = function(obj) {
       placeholder = ['"' + x + '"'].join();
       return placeholder
     }
+    
     if(typeof x == "object") {
-      return runThroughObject(x);
+      if(Array.isArray(x) == false) {
+        if(x == {}) {
+          return "{}";
+        } else {
+          return runThroughObject(x);
+        };
+      } else {
+        if(x.length === 0) {
+          return "[]"
+        } else {
+          return runThroughArray(x);
+        }
+      }
     }
   };
   
-  function runThroughObject(obj) {
+  function runThroughObject(o) {
     var keys = [];
     var values = [];
     var results = [];
-    if(Array.isArray(obj) == false) {
-      for(var k in obj) {
+    if(Array.isArray(o) == false) {
+      for(var k in o) {
         keys.push(String(k));
       }
       for(i = 0; i < keys.length; i++) {
-        var thing = checkType((obj[keys[i]]));
+        var thing = checkType((o[keys[i]]));
         values.push(String(thing));
       }
       for(i = 0; i <keys.length; i++) {
@@ -45,61 +59,45 @@ var stringifyJSON = function(obj) {
         results.push(values[i]);
       }
       finalresult.push("{" + results.join("") + "}");
-    } else {
-        console.log(obj);
-        console.log(finalresult);
-        if(Array.isArray(obj) == true && obj.length === 0) {
-          if(arrayopen) {
-            finalresult.push("]");
-            closebracket++;
-          } else {
-            finalresult.push("[]");
-            openbracket++;
-            closebracket++;
-          }
-          
-        }
-        for (i = 0; i < obj.length; i++) {
-          //console.log(obj.length);
-          if (Array.isArray(obj[i]) == false) {
-            if (i === 0) {
-              finalresult.push("[");
-              openbracket++;
-            }
-            //if(i > 0) {results.push(",");}
-            var thing = checkType(obj[i]);
-            if (i < obj.length - 1) {
-              results.push(thing + ",");
-            } else {
-              results.push(thing);
-            }
-            if(i >= obj.length - 1) {
-              results.push("]");
-              arrayopen = false;
-              closebracket++;
-            }
-            finalresult.push(results.join(""));
-            results = [];
-          } else { 
-            if (Array.isArray(obj[i])== true) {
-              finalresult.push("[");
-              arrayopen = true;
-              openbracket++
-            }
-            checkType(obj[i]);
-          }
-          
-        }
     }
+  };
+      
+  function runThroughArray(arr) {
+    for (var i = 0; i < arr.length; i++) {
+      if (Array.isArray(arr[i]) == false) {
+        //if(i > 0) {results.push(",");}
+        var thing = checkType(arr[i]);
+        if (arr.length == 1) {
+          miniresult.push("[" + thing + "]");
+        } else if (i === 0) {
+          miniresult.push("[" + thing);
+        } else if (i == arr.length - 1) {
+          miniresult.push(thing + "]");
+        } else {
+          miniresult.push(thing);
+        }
+      } else if ((arr[i]).length === 0 && i === 0) {
+        miniresult.push("[[]");
+      } else if ((arr[i]).length === 0) {
+        miniresult.push("[]");
+      } else {
+        checkType(arr[i]);
+      }
+    }
+    //finalresult.push("[" + miniresult.join() + "]");
+    finalresult.push(miniresult.join());
+    miniresult = [];
+    return finalresult.join("");
+  };
+
     
     // while (openbracket > closebracket) {
     //   finalresult.push("]");
     //   closebracket++;
     // }
     
-    return finalresult.join("");
-  };
-  return checkType(obj);
+    
+return checkType(obj);
 };
 
 //stringifyJSON([8,[[],3,4]])
