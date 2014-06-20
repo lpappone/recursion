@@ -2,24 +2,51 @@
 // var stringifyJSON = JSON.stringify;
 
 // but you don't so you're going to write it from scratch:
+// var toJSON = function (obj) {
+
+//   var typeCheck = function (obj) {
+
+//   }
+
+//   var integerToString = function (obj) {
+//     return String(obj);
+//   }
+
+//   var strToString = function (obj) {
+//     var qutoer = /\"/;
+//     return '"' + quoter.replace(obj, '\\"') + '"'
+//   }
+
+//   var arrayToString = function (obj) {
+
+//   }
+
+//   var type = typeCheck(obj);
+//   if (type == 'array' || type == 'object') {
+//     return toJson(obj);
+//   }
+
+// }
+
+
 var stringifyJSON = function(obj) {
-  var miniresult = [];
-  var finalresult = [];
-  var placeholder;
-  var openbracket = 0;
-  var closebracket = 0;
-  var arrayopen = false;
+  //var miniresult = [];
+  //var finalresult = [];
+  // var placeholder;
+  // var openbracket = 0;
+  // var closebracket = 0;
+  // var arrayopen = false;
 
   function checkType(x) {
+    // if(typeof x == "function" || x == undefined) {
+    //   return;
+    // }
     if(typeof x == "number" || typeof x == "boolean" || x == null) {
-      // finalresult.push(String(x));
-      // return finalresult.join();
+      if (x === undefined) return '"null"';
       placeholder = String(x);
       return placeholder;
     }
     if(typeof x == "string") {
-      // finalresult.push(x);
-      // return finalresult.join();
       placeholder = ['"' + x + '"'].join();
       return placeholder
     }
@@ -42,52 +69,66 @@ var stringifyJSON = function(obj) {
   };
   
   function runThroughObject(o) {
-    var keys = [];
     var values = [];
     var results = [];
-    if(Array.isArray(o) == false) {
-      for(var k in o) {
-        keys.push(String(k));
+    var i;
+
+    var copy = {};
+    for (var key in o) {
+      if (o.hasOwnProperty(key)) {
+        if (typeof o[key] == 'function' || typeof o[key] == 'undefined') continue;
+        copy[key] = o[key];
       }
-      for(i = 0; i < keys.length; i++) {
-        var thing = checkType((o[keys[i]]));
-        values.push(String(thing));
-      }
-      for(i = 0; i <keys.length; i++) {
-        results.push(keys[i]);
-        results.push(": ");
-        results.push(values[i]);
-      }
-      finalresult.push("{" + results.join("") + "}");
     }
+
+    var keys = Object.keys(copy);
+
+    for(i = 0; i < keys.length; i++) {
+      values.push(checkType(copy[keys[i]]));
+    }
+
+    for(i = 0; i < keys.length; i++) {
+      results.push('"' + keys[i] + '"' + ":" + values[i]);
+    }
+
+    // finalresult.push("{" + results.join() + "}");
+    return "{" + results.join() + "}";
   };
       
   function runThroughArray(arr) {
+    var memo = [];
     for (var i = 0; i < arr.length; i++) {
-      if (Array.isArray(arr[i]) == false) {
-        //if(i > 0) {results.push(",");}
-        var thing = checkType(arr[i]);
-        if (arr.length == 1) {
-          miniresult.push("[" + thing + "]");
-        } else if (i === 0) {
-          miniresult.push("[" + thing);
-        } else if (i == arr.length - 1) {
-          miniresult.push(thing + "]");
-        } else {
-          miniresult.push(thing);
-        }
-      } else if ((arr[i]).length === 0 && i === 0) {
-        miniresult.push("[[]");
-      } else if ((arr[i]).length === 0) {
-        miniresult.push("[]");
-      } else {
-        checkType(arr[i]);
-      }
+      memo.push(checkType(arr[i]));
     }
-    //finalresult.push("[" + miniresult.join() + "]");
-    finalresult.push(miniresult.join());
-    miniresult = [];
-    return finalresult.join("");
+    memo = '[' + memo.join() + ']';
+    return memo;
+    
+
+
+    //   if (Array.isArray(arr[i]) == false) {
+    //     //if(i > 0) {results.push(",");}
+    //     var thing = checkType(arr[i]);
+    //     if (arr.length == 1) {
+    //       miniresult.push("[" + thing + "]");
+    //     } else if (i === 0) {
+    //       miniresult.push("[" + thing);
+    //     } else if (i == arr.length - 1) {
+    //       miniresult.push(thing + "]");
+    //     } else {
+    //       miniresult.push(thing);
+    //     }
+    //   } else if ((arr[i]).length === 0 && i === 0) {
+    //     miniresult.push("[[]");
+    //   } else if ((arr[i]).length === 0) {
+    //     miniresult.push("[]");
+    //   } else {
+    //     checkType(arr[i]);
+    //   }
+    // }
+    // //finalresult.push("[" + miniresult.join() + "]");
+    // finalresult.push(miniresult.join());
+    // miniresult = [];
+    // return finalresult.join("");
   };
 
     
